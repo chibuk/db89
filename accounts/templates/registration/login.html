@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+ <head>
+    <meta charset="UTF-8" />
+    <title>DB89 вход</title>
+    <link rel="icon" type="{% static 'image/png' %}" href="64x64.png" />
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" type="text/css">
+ </head>
+
+<body>
+
+{% block content %}
+<div class="login-page">
+  <div class="form">
+      {% if next %}
+            {% if user.is_authenticated %}
+                <p>По Вашей учетной записи доступ к данной странице ограничен.</p>
+            {% else %}
+                <p>Для доступа требуется вход.</p>
+            {% endif %}
+      {% endif %}
+      <form class="login-form" method="post" action="{% url 'login' %}">
+          {% csrf_token %}
+          {{ form.username.label_tag }}
+          {{ form.username }}
+          {{ form.password.label_tag }}
+          {{ form.password }}
+          <input type="submit" value="Вход" />
+          <input type="hidden" name="next" value="{{ next }}" />
+          {% if form.errors %}
+            <p>Неверное имя или пароль. <a href="{% url 'password_reset' %}">Сброс пароля.</a></p>
+          {% endif %}
+      </form>
+  </div>
+</div>
+
+{% endblock %}
+<script src="login.js"></script>
+
+</body>
+</html>

@@ -10,27 +10,29 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-from pathlib import Path
+# from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(__file__).resolve().parent.parent
 
+from .settings_local import *
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-jfubsm$69(pfwasii3+ey$4#xn_-3_)8p^hdf8)37mjg&$zf1$'
+# SECRET_KEY = 'django-insecure-jfubsm$69(pfwasii3+ey$4#xn_-3_)8p^hdf8)37mjg&$zf1$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'db89.ru', 'www.db89.ru', '213.226.126.24']
+# ALLOWED_HOSTS = ['127.0.0.1', 'db89.ru', 'www.db89.ru', '213.226.126.24']
 
 # Application definition
 
 INSTALLED_APPS = [
-    'app.apps.AppConfig', 
+    'app',
+    'accounts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -73,16 +75,12 @@ WSGI_APPLICATION = 'db89.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'db89',
-        'USER': 'db89user',
-        'PASSWORD': 'A503to89rus#',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 # Password validation
@@ -107,7 +105,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'UTC'
 
@@ -127,3 +125,6 @@ STATIC_ROOT = join(BASE_DIR, 'static/')
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Redirect to home URL after login (Default redirects to /accounts/profile/)
+LOGIN_REDIRECT_URL = '/'

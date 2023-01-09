@@ -1,0 +1,12 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<h3>Город в базе данных.</h3>
+<div>{{city.name}}</div>
+<div>
+    <a href="{% url 'city-update' pk=city.pk %}">Редактировать</a>
+    <a href="{% url 'city-delete' pk=city.pk %}">Удалить</a>
+</div>
+
+{% endblock %}

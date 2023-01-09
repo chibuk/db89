@@ -1,0 +1,14 @@
+{% extends './base.html' %}
+
+{% block title %}
+    <title>Все функции.</title>
+{% endblock %}
+
+{% block content %}
+<ul>
+    <li><a href="{% url 'document-list' %}">Список документов</a> ({{documents.count}})
+        [ <a href="{% url 'document-add' %}" title="новый документ">+</a> ]</li>
+    <li><a href="{% url 'city-list' %}">Города</a> ({{citys.count}})
+        [ <a href="{% url 'city-add' %}" title="новый город">+</a> ]</li>
+</ul>
+{% endblock %}

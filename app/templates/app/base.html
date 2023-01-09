@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  {% block title %}<title>App</title>{% endblock %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'app/base.css' %}">
+</head>
+<body>
+  {% block sidebar %}<!-- insert default navigation text for every page -->
+  <div class="sidebar">
+    {% if user.is_authenticated %}
+    <p>Здравствуйте, {{user.get_username}}. <a href="{% url 'logout' %}?next={{request.path}}">Выход.</a></p>
+
+    <ul>
+      <li><a href="{% url 'index' %}">В начало</a></li>
+      <li><a href="{% url 'document-list' %}">Список документов</a>
+          [ <a href="{% url 'document-add' %}" title="создать документ">+</a> ]</li>
+      <li><a href="{% url 'city-list' %}">Города</a>
+          [ <a href="{% url 'city-add' %}" title="добавить город">+</a> ]</li>
+    </ul>
+
+    {% else %}
+    <p>Вы не авторизованы, <a href="{% url 'login'%}?next={{request.path}}">войти.</a></p>
+    {% endif %}
+  </div>
+  {% endblock %}
+
+  {% block content %}<!-- default content text (typically empty) -->{% endblock %}
+</body>
+</html>

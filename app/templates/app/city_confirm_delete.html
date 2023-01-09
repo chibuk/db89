@@ -1,0 +1,14 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<div>
+    <p>Точно удаляем {{ city }}?</p>
+    <form action="" method="post">
+        {% csrf_token %}
+        <input type="submit" value="Удалить">
+        <input type="button" onclick="history.back();" value="Отмена">
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<h3>Список документов в базе данных.</h3>
+<ul>
+    {% for document in document_list %}
+    <li>
+        <a href="{% url 'document-detail' pk=document.id %}">{{document.number}} - {{document.data}}</a>
+        ({{document.id}}) {{document.sender.name}} - {{document.destination_address}}
+    </li>
+    {% empty %}
+    <li>Список документов пуст.</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

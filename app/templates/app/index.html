@@ -5,10 +5,9 @@
 {% endblock %}
 
 {% block content %}
-<ul>
-    <li><a href="{% url 'document-list' %}">Список документов</a> ({{documents.count}})
-        [ <a href="{% url 'document-add' %}" title="новый документ">+</a> ]</li>
-    <li><a href="{% url 'city-list' %}">Города</a> ({{citys.count}})
-        [ <a href="{% url 'city-add' %}" title="новый город">+</a> ]</li>
-</ul>
+{% if user.is_authenticated %}
+<p>Выберите раздел.</p>
+{% else %}
+<p>Для доступа к разделам, войдите в систему!</p>
+{% endif %}
 {% endblock %}

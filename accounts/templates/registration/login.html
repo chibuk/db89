@@ -27,7 +27,7 @@
           {{ form.password.label_tag }}
           {{ form.password }}
           <input type="submit" value="Вход" />
-          <input type="hidden" name="next" value="{{ next }}" />
+          <input type="hidden" name="next" value="{% url 'index' %}" /> <!-- {{ next }} -->
           {% if form.errors %}
             <p>Неверное имя или пароль. <a href="{% url 'password_reset' %}">Сброс пароля.</a></p>
           {% endif %}

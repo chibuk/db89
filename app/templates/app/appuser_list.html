@@ -1,0 +1,17 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<h3>Пользователи.</h3>
+<ul>
+    {% for appuser in appuser_list %}
+    <li>
+        <a href="{% url 'appuser-detail' pk=appuser.id %}">{{appuser.user.username}} {{appuser.user.get_full_name}}</a>
+    </li>
+    {% empty %}
+    <li>Нет пользователей.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'appuser-add' %}">Создать нового пользователя.</a>
+
+{% endblock %}

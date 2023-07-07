@@ -1,0 +1,16 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<h3>Список оргенизаций в базе данных.</h3>
+<ul>
+    {% for organization in object_list %}
+    <li>
+        <a href="{% url 'organization-detail' pk=organization.id %}">{{organization.name}} - {{organization.inn}}</a>
+    </li>
+    {% empty %}
+    <li>Список пуст.</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

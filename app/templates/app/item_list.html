@@ -1,0 +1,17 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<h3>Список наименований в базе данных.</h3>
+<ul>
+    {% for item in object_list %}
+    <li>
+        <a href="{% url 'item-detail' pk=item.id %}">{{item.name}}</a>
+        <button class="delete is-danger" onclick="location.href='{% url 'item-delete' pk=item.id %}'"></button>
+    </li>
+    {% empty %}
+    <li>Список пуст.</li>
+    {% endfor %}
+</ul>
+<a class="button" href="{% url 'item-add' %}" title="создать наименование">+</a>
+{% endblock %}

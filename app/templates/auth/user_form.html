@@ -1,12 +1,12 @@
-{% extends './base.html' %}
+{% extends '../app/base.html' %}
 
 {% block content %}
 
 <div>
-    <p>Точно удаляем {{ city }}?</p>
     <form action="" method="post">
         {% csrf_token %}
-        <input type="submit" value="Удалить">
+        {{ form.as_p }}
+        <input type="submit" value="Сохранить">
         <input type="button" onclick="history.back();" value="Отмена">
     </form>
 </div>

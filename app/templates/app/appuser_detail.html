@@ -1,0 +1,16 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<h2>Учетная запись {{appuser.user.username}}</h2>
+<p>Имя:   {{appuser.user.first_name}}</p>
+<p>Фамилия:   {{appuser.user.last_name}}</p>
+<p>Email: {{appuser.user.email}}</p>
+<p>appuser.user.id: {{appuser.user.id}}</p>
+<p>appuser.id: {{appuser.id}}</p>
+<div>
+    <a href="{% url 'appuser-update' pk=appuser.user.id %}">Редактировать</a>
+    <a href="{% url 'appuser-delete' pk=appuser.user.id %}">Удалить.</a>
+</div>
+
+{% endblock %}

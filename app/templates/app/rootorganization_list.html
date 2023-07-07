@@ -1,0 +1,17 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<h3>Список Ваших организаций.</h3>
+<ul>
+    {% for root in object_list %}
+    <li>
+        <a href="{% url 'rootorganization-detail' pk=root.id %}">{{root.profile.name}}</a>
+    </li>
+    {% empty %}
+    <li>Список организаций пуст.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'rootorganization-add' %}">Новая органтзация.</a>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_div }}
+    <input type="submit" value="Сохранить">
+    <input type="button" onclick="history.back();" value="Отмена">
+</form>
+
+{% endblock %}
+
+<!--
+<div class="columns">
+    <div class="column">
+        <form class='box' action="" method="post">
+            {% csrf_token %}
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label" for="id_name">Наименование организации:</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <p class="control is-expanded">
+                            <input class="input" type="text" name="name" maxlength="50" required id="id_name" placeholder="Название организации">
+                        </p>
+                        <p class="help">Название организации</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="column is-narrow">
+        <div class='box content is-small' style='width: 42rem; height: 59rem;'>
+            <h3>test content H3</h3>
+            <p>Text content tests. Text content tests. Text content tests. </p>
+        </div>
+    </div>
+</div>
+
+-->

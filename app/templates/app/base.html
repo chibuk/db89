@@ -1,31 +1,53 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  {% block title %}<title>App</title>{% endblock %}
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'app/base.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% block title %}<title>db89</title>{% endblock %}
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'app/base.css' %}">
+    <link rel="stylesheet" href="{% static 'app/bulma.min.css' %}">
 </head>
-<body>
-  {% block sidebar %}<!-- insert default navigation text for every page -->
-  <div class="sidebar">
+<body class="has-navbar-fixed-top">
+<!--<div class="container">-->
+    {% block sidebar %}
+<!-- <div class="container is-fluid"> -->
     {% if user.is_authenticated %}
-    <p>Здравствуйте, {{user.get_username}}. <a href="{% url 'logout' %}?next={{request.path}}">Выход.</a></p>
-
-    <ul>
-      <li><a href="{% url 'index' %}">В начало</a></li>
-      <li><a href="{% url 'document-list' %}">Список документов</a>
-          [ <a href="{% url 'document-add' %}" title="создать документ">+</a> ]</li>
-      <li><a href="{% url 'city-list' %}">Города</a>
-          [ <a href="{% url 'city-add' %}" title="добавить город">+</a> ]</li>
-    </ul>
-
+    <nav class="navbar is-link is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="{% url 'rootorganization-list' %}">
+                <span>{{ user.appuser.root_organization }}</span>
+            </a>
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+        <div class="navbar-menu" id="navMenu">
+            <div class="navbar-start">
+                <a class="navbar-item" href="{% url 'document-list' %}">Документы</a>
+                <a class="navbar-item" href="{% url 'item-list' %}">Наименования</a>
+                <a class="navbar-item" href="{% url 'organization-list' %}">Организации</a>
+                <a class="navbar-item" href="{% url 'appuser-list' %}">Пользователи</a>
+            </div>
+            <div class="navbar-end">
+                <p class="navbar-item">{{user.get_full_name}} ({{ user.email }})</p>
+                <a class="navbar-item" href="{% url 'logout' %}?next={{request.path}}">Выход</a>
+            </div>
+    </nav>
     {% else %}
-    <p>Вы не авторизованы, <a href="{% url 'login'%}?next={{request.path}}">войти.</a></p>
+    <p class="box">Вы не авторизованы, <a href="{% url 'login'%}?next={{request.path}}">войти.</a></p>
     {% endif %}
-  </div>
-  {% endblock %}
+    {% endblock %}
 
-  {% block content %}<!-- default content text (typically empty) -->{% endblock %}
+<div class="box content">
+    {% block content %} {% endblock %}
+</div>
+
+<!--</div>-->
+<script src="{% static 'app/base.js' %}"></script>
 </body>
 </html>

@@ -1,27 +1,33 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Address, City, Item, Organization, Document, ItemsList
-
-admin.site.register(Address)
-admin.site.register(City)
-admin.site.register(Item)
+from app.models import Item, Organization, Document, AppUser, RootOrganization, DocumentItem
 
 
-class ItemsListAdmin(admin.ModelAdmin):
-    list_display = ('document', 'item', 'quantity', 'price', 'summ')
+class AppUserAdmin(admin.ModelAdmin):
+    list_display = ('user', 'root_organization')
 
 
-admin.site.register(ItemsList, ItemsListAdmin)
+class ItemAdmin(admin.ModelAdmin):
+    list_display = ('name', 'root')
 
 
 class OrganizationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'address', 'inn', 'phone', 'email')
+    list_display = ('name', 'address', 'inn', 'phone', 'email', 'root')
 
-admin.site.register(Organization, OrganizationAdmin)
+
+class DocumentItemAdmin(admin.TabularInline):
+    model = DocumentItem
+    list_display = ('document', 'item', 'weight', 'volume', 'price', 'seats', 'root')
 
 
 class DocumentAdmin(admin.ModelAdmin):
-    list_display = ('number', 'data', 'organization', 'city', 'destination_address')
+    list_display = ('number', 'data', 'root', 'city', 'destination_address')
+    inlines = [DocumentItemAdmin]
+
 
 admin.site.register(Document, DocumentAdmin)
+admin.site.register(Item, ItemAdmin)
+admin.site.register(Organization, OrganizationAdmin)
+admin.site.register(RootOrganization)
+admin.site.register(AppUser, AppUserAdmin)

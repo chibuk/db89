@@ -2,11 +2,11 @@
 
 {% block content %}
 
-<h2>{{document.organization.name}}</h2>
-<p>Адрес: {{document.organization.address}} ИНН: {{document.organization.inn}}
-    р/с {{document.organization.pay_acount}} в {{document.organization.bank}}, к/с {{document.organization.kor_acount}}
-    БИК: {{document.organization.bik}}<br> ОГРНИП: {{document.organization.ogrn}}<br>Тел.:
-    {{document.organization.phone}} email: {{document.organization.email}}</p>
+<h2>{{document.root.profile.name}}</h2>
+<p>Адрес: {{document.root.profile.address}} ИНН: {{document.root.profile.inn}}
+    р/с {{document.root.profile.pay_acount}} в {{document.root.profile.bank}}, к/с {{document.root.profile.kor_acount}}
+    БИК: {{document.root.profile.bik}}<br> ОГРНИП: {{document.root.profile.ogrn}}<br>Тел.:
+    {{document.root.profile.phone}} email: {{document.root.profile.email}}</p>
 <div>
     <h3>Товарно-транспортная накладная № {{document.number}} от {{document.data}}</h3>
     <p>Город: {{document.city}} номер ТС: {{document.truck}}</p>
@@ -25,11 +25,11 @@
                 <th>Сумма</th>
             </tr>
         </thead>
-        {% for row in document.itemslist_set.all %}
+        {% for row in document.items.all %}
         <tr>
             <td>{{forloop.counter}}</td>
             <td>{{row.item}}</td>
-            <td>{{row.quantity}}</td>
+            <td>{{row.seats}}</td>
             <td>{{row.weight}}</td>
             <td>{{row.volume}}</td>
             <td>{{row.price}}</td>
@@ -44,4 +44,8 @@
 <div>Адрес доставки: {{document.destination_address}}</div>
 <div>{{document.text}}</div>
 
+<div>
+    <a href="{% url 'document-update' pk=document.id %}">Редактировать</a>
+    <a href="{% url 'document-delete' pk=document.id %}">Удалить</a>
+</div>
 {% endblock %}

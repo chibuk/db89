@@ -1,0 +1,13 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<h2>Наименоание товара</h2>
+<p>Наименоание:   {{item.name}}</p>
+<p>id: {{item.id}}</p>
+<div>
+    <a href="{% url 'item-update' pk=item.id %}">Редактировать</a>
+    <a href="{% url 'item-delete' pk=item.id %}">Удалить.</a>
+</div>
+
+{% endblock %}

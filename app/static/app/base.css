@@ -1,5 +1,6 @@
+/*
 body {
-  background: #76b852; /* fallback for old browsers */
+  background: #76b852; /* fallback for old browsers
   background: rgb(141, 194, 111);
   background: linear-gradient(
     90deg,
@@ -63,3 +64,4 @@ body {
 .form .register-form {
   display: none;
 }
+*/

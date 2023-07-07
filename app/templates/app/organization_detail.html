@@ -1,0 +1,23 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<h2>{{object.name}}</h2>
+Адрес: {{object.address}}<br>
+ИНН: {{object.inn}}<br>
+КПП: {{object.kpp}}<br>
+ОГРН: {{object.ogrn}}<br>
+Банк: {{object.bank}}<br>
+БИК: {{object.bik}}<br>
+Р/счет: {{object.pay_acount}}<br>
+Кор/счет: {{object.kor_acount}}<br>
+Телефоны: {{object.phone}}<br>
+Email: {{object.email}}<br>
+Профиль: {{object.root}}<br>
+
+<div>
+    <a href="{% url 'organization-update' pk=organization.id %}">Редактировать</a>
+    <a href="{% url 'organization-delete' pk=organization.id %}">Удалить</a>
+</div>
+
+{% endblock %}

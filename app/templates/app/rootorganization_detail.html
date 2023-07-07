@@ -1,0 +1,14 @@
+{% extends './base.html' %}
+
+{% block content %}
+<hr>
+<div>Текущий профиль:</div>
+<h2>{{rootorganization.profile.name}}</h2>
+<h3>Пользователи профлия:</h3>
+<ol>
+    {% for user in rootorganization.users.all %}
+    <li>{{ user }}</li>
+    {% endfor %}
+</ol>
+
+{% endblock %}

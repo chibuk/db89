@@ -4,19 +4,24 @@
 {% endblock %}
 {% block content %}
 
-<div class="content">
-    <h3>Список документов в базе данных.</h3>
-    <ul>
-        {% for document in document_list %}
-        <li>
-            <a href="{% url 'document-detail' pk=document.id %}">{{document.number}} - {{document.data}}</a>
-            {{document.sender.name}} - {{document.destination_address}}
-            <button class="delete" onclick="location.href='{% url 'document-delete' pk=document.id %}'"></button>
-        </li>
-        {% empty %}
-        <li>Список документов пуст.</li>
-        {% endfor %}
-    </ul>
-    <a class='button' href="{% url 'document-add' %}" title="создать документ">Создать</a>
-</div>
+<!--<div class="content">-->
+<!--    <h3>Список документов в базе данных.</h3>-->
+<!--    <ul>-->
+<!--        {% for document in document_list %}-->
+<!--        <li>-->
+<!--            <a href="{% url 'document-detail' pk=document.id %}">{{document.number}} - {{document.data}}</a>-->
+<!--            {{document.sender.name}} - {{document.destination_address}}-->
+<!--            <button class="delete" onclick="location.href='{% url 'document-delete' pk=document.id %}'"></button>-->
+<!--        </li>-->
+<!--        {% empty %}-->
+<!--        <li>Список документов пуст.</li>-->
+<!--        {% endfor %}-->
+<!--    </ul>-->
+<!--    <a class='button' href="{% url 'document-add' %}" title="создать документ">Создать</a>-->
+<!--</div>-->
+
+<div id="app"></div>
+{% load static %}
+<script src="{% static 'app/document.js' %}"></script>
+
 {% endblock %}

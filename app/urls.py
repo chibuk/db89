@@ -31,4 +31,10 @@ urlpatterns = [
     path('api/v1/organizations/', views.OrganizationAPIListView.as_view()),
     path('api/v1/documents/', views.DocumentAPIListView.as_view()),
     path('api/v1/documentitems/', views.DocumentItemAPIListView.as_view()),
+    path('api/v1/items/', views.ItemAPIModelView.as_view({'post': 'create',
+                                                          'get': 'list'})),
+    path('api/v1/items/<int:pk>/', views.ItemAPIModelView.as_view({'get': 'retrieve',
+                                                                   'put': 'partial_update',
+                                                                   'delete': 'destroy',
+                                                                   'patch': 'partial_update'}))
 ]

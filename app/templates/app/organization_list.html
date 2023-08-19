@@ -1,16 +1,20 @@
 {% extends './base.html' %}
-
+{% block title %}<title>db89 - Организации</title>{% endblock %}
 {% block content %}
 
-<h3>Список оргенизаций в базе данных.</h3>
-<ul>
-    {% for organization in object_list %}
-    <li>
-        <a href="{% url 'organization-detail' pk=organization.id %}">{{organization.name}} - {{organization.inn}}</a>
-    </li>
-    {% empty %}
-    <li>Список пуст.</li>
-    {% endfor %}
-</ul>
+<!--<h3>Список оргенизаций в базе данных.</h3>-->
+<!--<ul>-->
+<!--    {% for organization in object_list %}-->
+<!--    <li>-->
+<!--        <a href="{% url 'organization-detail' pk=organization.id %}">{{organization.name}} - {{organization.inn}}</a>-->
+<!--    </li>-->
+<!--    {% empty %}-->
+<!--    <li>Список пуст.</li>-->
+<!--    {% endfor %}-->
+<!--</ul>-->
+
+<div id="app"></div>
+{% load static %}
+<script src="{% static 'app/organization.js' %}"></script>
 
 {% endblock %}

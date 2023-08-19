@@ -94,7 +94,7 @@ class Item(models.Model):
     """
     Справочник товарных единиц (наименование груза), то, что заполняет табличную часть документа ТТН
     """
-    name = models.CharField("Наименование груза", max_length=256, help_text="Наименование", unique=False, blank=False)
+    name = models.CharField("Наименование груза", max_length=128, help_text="Наименование", unique=False, blank=False)
     root = models.ForeignKey('RootOrganization',
                              on_delete=models.CASCADE,
                              help_text="Профиль",
@@ -103,7 +103,11 @@ class Item(models.Model):
     class Meta:
         verbose_name = 'Наименование груза'
         verbose_name_plural = 'Наименования груза'
-        ordering = ['name']
+        # ordering = ['name'] # это ресурсозатратно
+        # Уникальность name для root (same as unique_together):
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'root'], name='root_name_uinique')
+        ]
 
     def __str__(self):
         return self.name

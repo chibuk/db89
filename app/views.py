@@ -4,17 +4,20 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListCreateAPIView, CreateAPIView
+from rest_framework.viewsets import ModelViewSet
+
 from app.models import Document, AppUser, RootOrganization, Organization, Item, DocumentItem
 from django.views.generic import ListView, DetailView
 from app.forms import DocumentForm, OrganizationForm, UserRegistrationForm, RootOrganizationCreateForm, ItemForm
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.parsers import MultiPartParser
 # Create your views here.
 from django.http import HttpResponse
-from app.serializers import OrganizationSerializer, DocumentSerializer, DocumentItemSerializer
+from app.serializers import OrganizationSerializer, DocumentSerializer, DocumentItemSerializer, ItemSerializer
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -55,15 +58,18 @@ class CreateRootMixin:
 
 
 # <API>
-class OrganizationAPIListView(ListAPIView):
+class OrganizationAPIListView(ListCreateAPIView):
     serializer_class = OrganizationSerializer
 
     def get_queryset(self):
         queryset = Organization.objects.filter(root=self.request.user.appuser.root_organization)
         return queryset
 
+    def perform_create(self, serializer):
+        serializer.save(root=self.request.user.appuser.root_organization)
 
-class DocumentAPIListView(ListAPIView):
+
+class DocumentAPIListView(ListCreateAPIView):
     serializer_class = DocumentSerializer
 
     def get_queryset(self):
@@ -71,12 +77,23 @@ class DocumentAPIListView(ListAPIView):
         return queryset
 
 
-class DocumentItemAPIListView(ListAPIView):
+class DocumentItemAPIListView(ListCreateAPIView):
     serializer_class = DocumentItemSerializer
 
     def get_queryset(self):
         queryset = DocumentItem.objects.filter(root=self.request.user.appuser.root_organization)
         return queryset
+
+
+class ItemAPIModelView(ModelViewSet):
+    serializer_class = ItemSerializer
+
+    def get_queryset(self):
+        queryset = Item.objects.filter(root=self.request.user.appuser.root_organization)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(root=self.request.user.appuser.root_organization)
 # </API>
 
 

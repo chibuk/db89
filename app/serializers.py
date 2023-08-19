@@ -28,6 +28,7 @@ class DocumentSerializer(serializers.ModelSerializer):
         exclude = ['root']
         depth = 1
 
-    # sender = OrganizationSerializer()
-    # receiver = OrganizationSerializer()
-    # payer = OrganizationSerializer()
+#  Обратить  внимание:
+#  CreateOnlyDefault
+#  https://ilyachch.gitbook.io/django-rest-framework-russian-documentation/overview/navigaciya-po-api/validators#rasshirennye-znacheniya-polei-po-umolchaniyu
+#  https://www.django-rest-framework.org/api-guide/validators/#currentuserdefault

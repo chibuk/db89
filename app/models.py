@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
@@ -6,11 +8,14 @@ from django.contrib.auth.models import User
 # Create your models here
 class Organization(models.Model):
     """
-    Организации, справочник
+    Организации, справочник.
+    Из этого же справочника организация становится root'ом и меткой (владельцем) для остальных компонентов БД.
+    TODO: разработать механизм начальной регистрации организации-владельца БД, когда поле root будет пустым.
+    TODO: решить вопрос показывать ли влдаельца в общем списке организаций-клиентов root=(самому себе)
     """
     name = models.CharField("Наименование организации", max_length=50, help_text='Название организации')
     address = models.CharField('Адрес', max_length=256, blank=True, help_text="Адрес")
-    inn = models.CharField('ИНН', max_length=10, help_text='ИНН', blank=True)
+    inn = models.CharField('ИНН', max_length=10, help_text='ИНН')   # обязательное ункалное для root
     kpp = models.CharField('КПП', max_length=9, help_text='КПП', blank=True)
     ogrn = models.CharField('ОГРН', max_length=15, help_text='ОГРН или ОГРНИП', blank=True)
     bank = models.CharField('Банк, наименование', max_length=150, help_text='Наименование банка', blank=True)
@@ -30,7 +35,11 @@ class Organization(models.Model):
     class Meta:
         verbose_name = 'Организация'
         verbose_name_plural = 'Организации'
-        ordering = ['name']
+        # ordering = ['name']   ресурсозатратно
+        # Уникальность inn для root (same as unique_together):
+        constraints = [
+            models.UniqueConstraint(fields=['inn', 'root'], name='inn_name_uinique')
+        ]
 
     def __str__(self):
         return f'{self.name} {self.inn}'
@@ -117,7 +126,10 @@ class Item(models.Model):
 
 
 class Document(models.Model):
-    number = models.CharField("Номер", max_length=15, help_text='Номер документа', unique=True)
+    # TODO: требуется программоный алгоритм назанчения номера (типа: n = последний максимальный +1)
+    # TODO: Нумерация начинается сначала каждый год
+    # номер и год уникальны для root
+    number = models.CharField("Номер", max_length=15, help_text='Номер документа')
     data = models.DateField("Дата", auto_now_add=True)
     root = models.ForeignKey(RootOrganization,
                              on_delete=models.CASCADE,
@@ -157,6 +169,14 @@ class Document(models.Model):
 
     def get_absolute_url(self):
         return reverse('document-detail', kwargs={'pk': self.pk})
+
+    """Проверка допустимости нового номера документа, новый номер боьше максимального.
+    Номер должен быть уже записан в текущем объетк (self)"""
+    @property # номер должен быть уникален для root в пределах календарного года
+    def test_number(self):
+        year = date(self.data).year     # current year
+        last = Document.objects.filter(root=self.root).filter(data__year=year).order_by('number').last()
+        return last.number < self.number    #
 
 
 class DocumentItem(models.Model):

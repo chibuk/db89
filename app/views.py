@@ -85,11 +85,34 @@ class DocumentItemAPIListView(ListCreateAPIView):
         return queryset
 
 
+# ModelViewSets
 class ItemAPIModelView(ModelViewSet):
     serializer_class = ItemSerializer
 
     def get_queryset(self):
         queryset = Item.objects.filter(root=self.request.user.appuser.root_organization)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(root=self.request.user.appuser.root_organization)
+
+
+class DocumentAPIModelView(ModelViewSet):
+    serializer_class = DocumentSerializer
+
+    def get_queryset(self):
+        queryset = Document.objects.filter(root=self.request.user.appuser.root_organization)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(root=self.request.user.appuser.root_organization)
+
+
+class OrganizationAPIModelView(ModelViewSet):
+    serializer_class = OrganizationSerializer
+
+    def get_queryset(self):
+        queryset = Organization.objects.filter(root=self.request.user.appuser.root_organization)
         return queryset
 
     def perform_create(self, serializer):
@@ -174,6 +197,7 @@ class AppUserUpdate(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserRegistrationForm
     success_url = reverse_lazy("appuser-list")
+
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.set_password(form.cleaned_data['password2'])

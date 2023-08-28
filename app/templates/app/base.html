@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     {% block title %}<title>db89</title>{% endblock %}
 
     {% load static %}
@@ -30,18 +29,18 @@
         </div>
         <div class="navbar-menu" id="navMenu">
             <div class="navbar-start">
-                <a class="navbar-item" href="{% url 'document-list' %}">
+                <a class="navbar-item" href="{% url 'document-list' %}" id="navbar-item-documaents">
                     <span class="icon mr-2"><i class="fa-light fa-list fa-lg"></i></span>
                     Документы
                 </a>
-                <a class="navbar-item" href="{% url 'item-list' %}">
+                <a class="navbar-item" href="{% url 'item-list' %}" id="navbar-item-items">
                     <span class="icon mr-2"><i class="fa-light fa-cart-flatbed-boxes fa-lg"></i></span>
                     Наименования</a>
-                <a class="navbar-item" href="{% url 'organization-list' %}">
+                <a class="navbar-item" href="{% url 'organization-list' %}" id="navbar-item-organizations">
                     <span class="icon mr-2"><i class="fa-light fa-car-building fa-lg"></i></span>
                     Организации
                 </a>
-                <a class="navbar-item" href="{% url 'appuser-list' %}">
+                <a class="navbar-item" href="{% url 'appuser-list' %}" id="navbar-item-appusers">
                     <span class="icon mr-2"><i class="fa-light fa-users fa-lg"></i></span>
                     Пользователи
                 </a>
@@ -67,7 +66,7 @@
 
 <footer class="footer">
     <div class="content has-text-centered has-text-dark">
-        <p> Футер страницы со <a href="#">ссылкой</a> и всё.</p>
+        <p> Футер страницы со <a href='#'>ссылкой</a> и всё.</p>
     </div>
 </footer>
 

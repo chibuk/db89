@@ -130,7 +130,7 @@ class Document(models.Model):
     # TODO: Нумерация начинается сначала каждый год
     # номер и год уникальны для root
     number = models.CharField("Номер", max_length=15, help_text='Номер документа')
-    data = models.DateField("Дата", auto_now_add=True)
+    date = models.DateField("Дата", auto_now_add=True)
     root = models.ForeignKey(RootOrganization,
                              on_delete=models.CASCADE,
                              help_text="Профиль",

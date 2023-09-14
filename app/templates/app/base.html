@@ -14,7 +14,7 @@
 <body class="has-navbar-fixed-top">
 
 {% block sidebar %}
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated %} <!-- см. ::target псевдоклас для подсветки пункта меню -->
     <nav class="navbar is-link is-fixed-top" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
             <a class="navbar-item" href="{% url 'rootorganization-list' %}">

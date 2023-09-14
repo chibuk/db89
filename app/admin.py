@@ -22,7 +22,7 @@ class DocumentItemAdmin(admin.TabularInline):
 
 
 class DocumentAdmin(admin.ModelAdmin):
-    list_display = ('number', 'data', 'root', 'city', 'destination_address')
+    list_display = ('number', 'date', 'root', 'city', 'destination_address')
     inlines = [DocumentItemAdmin]
 
 

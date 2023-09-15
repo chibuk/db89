@@ -47,4 +47,5 @@ urlpatterns = [
                                                                    'put': 'partial_update',
                                                                    'delete': 'destroy',
                                                                    'patch': 'partial_update'})),
+    path('api/v1/currency', views.CurrencyCBR.as_view()),
 ]

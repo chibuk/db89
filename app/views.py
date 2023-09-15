@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView, CreateAPIView
@@ -27,6 +28,26 @@ def index(request):
         return HttpResponseRedirect(reverse_lazy('document-list'))
     else:
         return HttpResponseRedirect(reverse_lazy('login'))
+
+
+import requests
+
+
+class CurrencyCBR(APIView):
+
+    renderer_classes = [JSONRenderer]
+
+    # Считаем через курс к рублю, т.к. https://www.cbr-xml-daily.ru/ не поддерживает смену базовой валюты
+    def get(self, request):
+        data = requests.get('https://www.cbr-xml-daily.ru/latest.js').json()
+        data['rates']['RUB'] = 1        # в data все курсы к базовой валюте RUB, нет там записи RUB, добавляем
+        param_from = request.query_params['from']   # считываем параметр
+        data_from = data['rates'][param_from]       # сохраняем его значение
+        param_to = request.query_params['to']
+        data_to = data['rates'][param_to]
+        param_value = request.query_params['value']
+        result = (float(data_to)/1) / (float(data_from)/1) * float(param_value) # расчет через курс к рублю
+        return Response({'result': round(result, 2), 'resource': "https://www.cbr-xml-daily.ru/latest.js"})
 
 
 def logoutView(request):

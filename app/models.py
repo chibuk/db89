@@ -126,11 +126,10 @@ class Item(models.Model):
 
 
 class Document(models.Model):
-    # TODO: требуется программоный алгоритм назанчения номера (типа: n = последний максимальный +1)
-    # TODO: Нумерация начинается сначала каждый год
-    # номер и год уникальны для root
     number = models.CharField("Номер", max_length=15, help_text='Номер документа')
-    date = models.DateField("Дата", auto_now_add=True)
+    created = models.DateTimeField("Создано", auto_now_add=True)
+    modified = models.DateTimeField("Изменено", auto_now=True)
+    date = models.DateField("Дата")
     root = models.ForeignKey(RootOrganization,
                              on_delete=models.CASCADE,
                              help_text="Профиль",
@@ -139,25 +138,28 @@ class Document(models.Model):
     truck = models.CharField("Номер ТС", max_length=20, help_text='№ ТС')
     sender = models.ForeignKey(Organization,
                                on_delete=models.PROTECT,
-                               blank=True,
-                               null=True,
+                               # blank=True,
+                               # null=True,
                                related_name='doc_sender',
                                verbose_name='Отправитель')
     receiver = models.ForeignKey(Organization,
                                  on_delete=models.PROTECT,
-                                 blank=True,
-                                 null=True,
+                                 # blank=True,
+                                 # null=True,
                                  related_name='doc_receiver',
                                  verbose_name='Получатель')
     payer = models.ForeignKey(Organization,
                               on_delete=models.PROTECT,
-                              blank=True,
-                              null=True,
+                              # blank=True,
+                              # null=True,
                               related_name='doc_payer',
                               verbose_name='Плательщик')
     spec_notes = models.TextField("Особые отметки", help_text="Особые отметки", blank=True)
-    destination_address = models.CharField("Адрес доставки", max_length=256, help_text='Адрес доставки', blank=True)
+    destination_address = models.CharField("Адрес доставки", max_length=256,
+                                           help_text='Адрес доставки', blank=True)
     text = models.TextField("Условия договора", help_text='Условия договора', blank=True)
+    doc_sum = models.DecimalField("Сумма документа", max_digits=14, decimal_places=2,
+                                  help_text="Итого", default=0)
 
     class Meta:
         verbose_name = 'Документ'
@@ -165,18 +167,18 @@ class Document(models.Model):
         ordering = ['number']
 
     def __str__(self):
-        return f'{self.root} - {self.number} {self.data}'
+        return f'{self.root} - {self.number} {self.date}'
 
     def get_absolute_url(self):
         return reverse('document-detail', kwargs={'pk': self.pk})
 
     """Проверка допустимости нового номера документа, новый номер боьше максимального.
-    Номер должен быть уже записан в текущем объетк (self)"""
+    Номер должен быть уже записан в текущем объекте (self)"""
     @property # номер должен быть уникален для root в пределах календарного года
     def test_number(self):
-        year = date(self.data).year     # current year
-        last = Document.objects.filter(root=self.root).filter(data__year=year).order_by('number').last()
-        return last.number < self.number    #
+        year = date(self.date).year     # current year
+        last = Document.objects.filter(root=self.root).filter(date__year=year).order_by('number').last()
+        return last.number < self.number
 
 
 class DocumentItem(models.Model):
@@ -191,8 +193,9 @@ class DocumentItem(models.Model):
                                  related_name='items')
     weight = models.CharField("Вес", max_length=25, help_text="Вес", blank=True)
     volume = models.CharField("Объём", max_length=25, help_text="Объём", blank=True)
-    price = models.DecimalField("Цена", max_digits=14, decimal_places=2, help_text="Цена")
-    seats = models.PositiveSmallIntegerField('Количество мест', help_text='Количество мест')
+    price = models.DecimalField("Цена", max_digits=14, decimal_places=2, help_text="Цена", blank=True)
+    seats = models.PositiveSmallIntegerField('Количество мест', help_text='Количество мест', blank=True)
+    item_sum = models.DecimalField("Сумма", max_digits=14, decimal_places=2, help_text="Сумма", default=0)
     root = models.ForeignKey(RootOrganization,
                              on_delete=models.CASCADE,
                              help_text="Профиль",

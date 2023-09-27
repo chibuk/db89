@@ -28,6 +28,11 @@ class DocumentSerializer(serializers.ModelSerializer):
         exclude = ['root']
         depth = 1
 
+# post_data = self.request.POST
+#         sender = Organization.objects.get(id=post_data["sender"])
+#         receiver = Organization.objects.get(pk=post_data['receiver'])
+#         payer = Organization.objects.get(pk=post_data['payer'])
+
 #  Обратить  внимание:
 #  CreateOnlyDefault
 #  https://ilyachch.gitbook.io/django-rest-framework-russian-documentation/overview/navigaciya-po-api/validators#rasshirennye-znacheniya-polei-po-umolchaniyu

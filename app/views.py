@@ -1,5 +1,8 @@
+from datetime import datetime
+
 from django import forms
 from django.contrib.auth.models import User
+from django.db.models.aggregates import Max
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -21,6 +24,7 @@ from django.http import HttpResponse
 from app.serializers import OrganizationSerializer, DocumentSerializer, DocumentItemSerializer, ItemSerializer
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+import requests
 
 
 def index(request):
@@ -28,26 +32,6 @@ def index(request):
         return HttpResponseRedirect(reverse_lazy('document-list'))
     else:
         return HttpResponseRedirect(reverse_lazy('login'))
-
-
-import requests
-
-
-class CurrencyCBR(APIView):
-
-    renderer_classes = [JSONRenderer]
-
-    # Считаем через курс к рублю, т.к. https://www.cbr-xml-daily.ru/ не поддерживает смену базовой валюты
-    def get(self, request):
-        data = requests.get('https://www.cbr-xml-daily.ru/latest.js').json()
-        data['rates']['RUB'] = 1        # в data все курсы к базовой валюте RUB, нет там записи RUB, добавляем
-        param_from = request.query_params['from']   # считываем параметр
-        data_from = data['rates'][param_from]       # сохраняем его значение
-        param_to = request.query_params['to']
-        data_to = data['rates'][param_to]
-        param_value = request.query_params['value']
-        result = (float(data_to)/1) / (float(data_from)/1) * float(param_value) # расчет через курс к рублю
-        return Response({'result': round(result, 2), 'resource': "https://www.cbr-xml-daily.ru/latest.js"})
 
 
 def logoutView(request):
@@ -126,7 +110,27 @@ class DocumentAPIModelView(ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(root=self.request.user.appuser.root_organization)
+        _root = self.request.user.appuser.root_organization
+        _data = self.request.data
+        serializer.save(root=_root,
+                        sender=Organization.objects.filter(root=_root).get(id=_data['sender']),
+                        receiver=Organization.objects.filter(root=_root).get(id=_data['receiver']),
+                        payer=Organization.objects.filter(root=_root).get(id=_data['payer']))
+
+
+class DocumentitemAPIModelView(ModelViewSet):
+    serializer_class = DocumentItemSerializer
+
+    def get_queryset(self):
+        queryset = DocumentItem.objects.filter(root=self.request.user.appuser.root_organization)
+        return queryset
+
+    def perform_create(self, serializer):
+        _root = self.request.user.appuser.root_organization
+        _data = self.request.data
+        serializer.save(root=_root,
+                        document=Document.objects.filter(root=_root).get(id=_data['document']),
+                        item=Item.objects.filter(root=_root).get(name=_data['name']))
 
 
 class OrganizationAPIModelView(ModelViewSet):
@@ -138,6 +142,57 @@ class OrganizationAPIModelView(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(root=self.request.user.appuser.root_organization)
+
+
+class DocumentNumber(LoginRequiredMixin, APIView):
+    """Выдает очередной номер для нового документа по правилам именования:
+    - TODO: каждый год нумерация начинается сначала,
+    - номера в пределах года уникальные,
+    - следующий номер получаем на основе последнего, прибавляя единицу к числу в конце"""
+    renderer_classes = [JSONRenderer]
+
+    @staticmethod
+    def strplus(s):
+        """Номер состоит из перфикса и числа. Разбираем строку на перфикс и число, увеличеваем
+        число (счетчик) и собираем обратно"""
+        num = ''
+        prefix = ''
+        for i in range(len(s)-1, -1, -1):       # перебор символов с конца
+            if s[i].isdigit():                  # в конце должно быть число, числа слева от других знаков
+                num = s[i] + num                # итерпретируются как строка (префикс)
+            else:                               # с первого не числа идет префикс
+                prefix = s[i] + prefix
+        num = num if len(num) > 0 else "0000"   # если чила нет, то появится "0001"
+        ll = len(num)
+        num = str(int(num) + 1)                 # тут теряем нули в начале числа 001->1
+        for i in range(ll - len(num)):           # тут их восстанавливаем 1->001
+            num = "0" + num
+        return prefix + num
+
+    def get(self, request):
+        # TODO: если в этом году нет документов, то номер сразу равен пустой ("") строке, иначе:
+        # TODO: добавить в строке ниже в выборку фильтр: в переделах текущего года.
+        max_num = (Document.objects.filter(root=self.request.user.appuser.root_organization)
+                   .filter(date__year=datetime.now().year).aggregate(Max('number')))
+        numb = self.strplus(max_num['number__max'])
+        return Response({"number": numb})   # sample response: {"number":"Т012"}
+
+
+class CurrencyCBR(APIView):
+    """Конвертер валют, учебное задание https://db89.ru/api/v1/currency?to=RUB&from=USD&value=1"""
+    renderer_classes = [JSONRenderer]
+
+    # Считаем через курс к рублю, т.к. https://www.cbr-xml-daily.ru/ не поддерживает смену базовой валюты
+    def get(self, request):
+        data = requests.get('https://www.cbr-xml-daily.ru/latest.js').json()
+        data['rates']['RUB'] = 1  # в data все курсы к базовой валюте RUB, нет там записи RUB, добавляем
+        param_from = request.query_params['from']  # считываем параметр
+        data_from = data['rates'][param_from]  # сохраняем его значение
+        param_to = request.query_params['to']
+        data_to = data['rates'][param_to]
+        param_value = request.query_params['value']
+        result = (float(data_to) / 1) / (float(data_from) / 1) * float(param_value)  # расчет через курс к рублю
+        return Response({'result': round(result, 2), 'resource': "https://www.cbr-xml-daily.ru/latest.js"})
 # </API>
 
 

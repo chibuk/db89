@@ -1,20 +1,23 @@
 {% extends './base.html' %}
-
+{% block head %}
+{% load static %}
+    <link rel="stylesheet" href="{% static 'app/document_detail.css' %}">
+{% endblock %}
 {% block content %}
 
-<div class="box content">
+<div class="document content">
     <h2>{{document.root.profile.name}}</h2>
     <p>Адрес: {{document.root.profile.address}} ИНН: {{document.root.profile.inn}}
-        р/с {{document.root.profile.pay_acount}} в {{document.root.profile.bank}}, к/с {{document.root.profile.kor_acount}}
+        р/с {{document.root.profile.pay_account}} в {{document.root.profile.bank}}, к/с {{document.root.profile.kor_account}}
         БИК: {{document.root.profile.bik}}<br> ОГРНИП: {{document.root.profile.ogrn}}<br>Тел.:
         {{document.root.profile.phone}} email: {{document.root.profile.email}}</p>
     <div>
-        <h3>Товарно-транспортная накладная № {{document.number}} от {{document.data}}</h3>
+        <h3>Товарно-транспортная накладная № {{document.number}} от {{document.date}}</h3>
         <p>Город: {{document.city}} номер ТС: {{document.truck}}</p>
         <p>Отправитель: {{document.sender}}</p>
         <p>Получатель: {{document.receiver}}</p>
         <p>Плательщик: {{document.payer}}</p>
-        <table class="table is-bordered">
+        <table class="table is-narrow is-bordered">
             <thead>
                 <tr>
                     <th>№ п/п</th>
@@ -28,8 +31,8 @@
             </thead>
             <tfoot>
                 <tr>
-                    <td></td> <td></td> <td></td> <td></td> <td></td>
-                    <td class="has-text-right">
+                    <td></td> <td></td>
+                    <td colspan="4" class="has-text-right">
                         Всего к оплате:
                     </td>
                     <td class="has-text-weight-bold	">
@@ -55,10 +58,12 @@
     <div>Особые отметки: {{document.spec_notes}}</div>
     <div>Адрес доставки: {{document.destination_address}}</div>
     <div>{{document.text}}</div>
+
+    <div class="no-print">
+        <a class="button" href="{% url 'document-update' pk=document.id %}">Редактировать</a>
+        <a class="button" href="{% url 'document-delete' pk=document.id %}">Удалить</a>
+    </div>
 </div>
 
-<div class="no-print">
-    <a class="button" href="{% url 'document-update' pk=document.id %}">Редактировать</a>
-    <a class="button" href="{% url 'document-delete' pk=document.id %}">Удалить</a>
-</div>
+
 {% endblock %}

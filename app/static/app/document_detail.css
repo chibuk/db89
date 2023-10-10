@@ -1,0 +1,8 @@
+table.is-bordered tfoot tr td {
+    border: none;
+}
+
+div.document {
+    padding: 2rem 1rem;
+    margin-bottom: 0rem;
+}

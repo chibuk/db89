@@ -20,8 +20,8 @@ class Organization(models.Model):
     ogrn = models.CharField('ОГРН', max_length=15, help_text='ОГРН или ОГРНИП', blank=True)
     bank = models.CharField('Банк, наименование', max_length=150, help_text='Наименование банка', blank=True)
     bik = models.CharField('БИК', max_length=9, help_text='БИК', blank=True)
-    pay_acount = models.CharField('Расчетный счет', max_length=20, help_text='Расчетный счет', blank=True)
-    kor_acount = models.CharField('Корр. счет', max_length=20, help_text='Корр. счет', blank=True)
+    pay_account = models.CharField('Расчетный счет', max_length=20, help_text='Расчетный счет', blank=True)
+    kor_account = models.CharField('Корр. счет', max_length=20, help_text='Корр. счет', blank=True)
     phone = models.CharField('Номера телефонов', max_length=40, help_text='Телефон', blank=True)
     email = models.EmailField('Адрес Email', help_text='Адрес email', blank=True)
     root = models.ForeignKey('RootOrganization',
@@ -135,7 +135,7 @@ class Document(models.Model):
                              help_text="Профиль",
                              verbose_name='Профиль')
     city = models.CharField('Город', max_length=100, help_text='Город')
-    truck = models.CharField("Номер ТС", max_length=20, help_text='№ ТС')
+    truck = models.CharField("Номер ТС", max_length=20, help_text='№ ТС', blank=True)
     sender = models.ForeignKey(Organization,
                                on_delete=models.PROTECT,
                                # blank=True,
@@ -164,7 +164,11 @@ class Document(models.Model):
     class Meta:
         verbose_name = 'Документ'
         verbose_name_plural = 'Документы'
-        ordering = ['number']
+        # ordering = ['number']
+        # TODO: Проверочное ограничение на уникальность ноиера документа в пределах текущего года.
+        # constraints = [
+            # models.CheckConstraint(..., name='root_name_uinique')
+        # ]
 
     def __str__(self):
         return f'{self.root} - {self.number} {self.date}'
@@ -174,11 +178,11 @@ class Document(models.Model):
 
     """Проверка допустимости нового номера документа, новый номер боьше максимального.
     Номер должен быть уже записан в текущем объекте (self)"""
-    @property # номер должен быть уникален для root в пределах календарного года
-    def test_number(self):
-        year = date(self.date).year     # current year
-        last = Document.objects.filter(root=self.root).filter(date__year=year).order_by('number').last()
-        return last.number < self.number
+    # @property # номер должен быть уникален для root в пределах календарного года
+    # def test_number(self):
+    #     year = date(self.date).year     # current year
+    #     last = Document.objects.filter(root=self.root).filter(date__year=year).order_by('number').last()
+    #     return last.number < self.number
 
 
 class DocumentItem(models.Model):
@@ -209,6 +213,6 @@ class DocumentItem(models.Model):
     def __str__(self):
         return f'{self.item} - {self.document} {self.seats}'
 
-    @property
-    def summ(self):
-        return self.seats * self.price
+    # @property
+    # def summ(self):
+    #     return self.seats * self.price

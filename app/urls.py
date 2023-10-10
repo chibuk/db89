@@ -34,6 +34,7 @@ urlpatterns = [
                                                                                    'put': 'partial_update',
                                                                                    'delete': 'destroy',
                                                                                    'patch': 'partial_update'})),
+    path('api/v1/organizations/search/<str:keyword>', views.OrganizationAPIModelView.as_view({'get': 'search'})),
     path('api/v1/documents/', views.DocumentAPIModelView.as_view({'post': 'create',
                                                                   'get': 'list'})),
     path('api/v1/documents/<int:pk>/', views.DocumentAPIModelView.as_view({'get': 'retrieve',
@@ -53,6 +54,7 @@ urlpatterns = [
                                                                    'put': 'partial_update',
                                                                    'delete': 'destroy',
                                                                    'patch': 'partial_update'})),
+    path('api/v1/items/search/<str:keyword>', views.ItemAPIModelView.as_view({'get': "search"})),
     path('api/v1/currency', views.CurrencyCBR.as_view()),
     path('api/v1/documentnumber/', views.DocumentNumber.as_view()),
 ]

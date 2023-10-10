@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django import forms
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.db.models.aggregates import Max
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
@@ -96,10 +97,24 @@ class ItemAPIModelView(ModelViewSet):
 
     def get_queryset(self):
         queryset = Item.objects.filter(root=self.request.user.appuser.root_organization)
+        # queryset = Item.objects.filter(root=RootOrganization.objects.last())   #dev
         return queryset
 
     def perform_create(self, serializer):
         serializer.save(root=self.request.user.appuser.root_organization)
+
+    def search(self, request, keyword, *args, **kwargs):
+        # keyword = kwargs.get["keyword"]
+        # keyword = request.query_params["keyword"]
+        queryset = self.filter_queryset(self.get_queryset()).filter(name__icontains=keyword)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class DocumentAPIModelView(ModelViewSet):
@@ -138,10 +153,25 @@ class OrganizationAPIModelView(ModelViewSet):
 
     def get_queryset(self):
         queryset = Organization.objects.filter(root=self.request.user.appuser.root_organization)
+        # queryset = Organization.objects.filter(root=RootOrganization.objects.last())    #dev
         return queryset
 
     def perform_create(self, serializer):
         serializer.save(root=self.request.user.appuser.root_organization)
+
+    def search(self, request, keyword, *args, **kwargs):
+        # keyword = kwargs.get["keyword"]
+        # keyword = request.query_params["keyword"]
+        queryset = self.filter_queryset(self.get_queryset()).filter(
+            Q(name__icontains=keyword) | Q(inn__icontains=keyword))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class DocumentNumber(LoginRequiredMixin, APIView):
@@ -157,15 +187,15 @@ class DocumentNumber(LoginRequiredMixin, APIView):
         число (счетчик) и собираем обратно"""
         num = ''
         prefix = ''
-        for i in range(len(s)-1, -1, -1):       # перебор символов с конца
-            if s[i].isdigit():                  # в конце должно быть число, числа слева от других знаков
-                num = s[i] + num                # итерпретируются как строка (префикс)
-            else:                               # с первого не числа идет префикс
+        for i in range(len(s) - 1, -1, -1):  # перебор символов с конца
+            if s[i].isdigit():  # в конце должно быть число, числа слева от других знаков
+                num = s[i] + num  # итерпретируются как строка (префикс)
+            else:  # с первого не числа идет префикс
                 prefix = s[i] + prefix
-        num = num if len(num) > 0 else "0000"   # если чила нет, то появится "0001"
+        num = num if len(num) > 0 else "0000"  # если чила нет, то появится "0001"
         ll = len(num)
-        num = str(int(num) + 1)                 # тут теряем нули в начале числа 001->1
-        for i in range(ll - len(num)):           # тут их восстанавливаем 1->001
+        num = str(int(num) + 1)  # тут теряем нули в начале числа 001->1
+        for i in range(ll - len(num)):  # тут их восстанавливаем 1->001
             num = "0" + num
         return prefix + num
 
@@ -174,8 +204,11 @@ class DocumentNumber(LoginRequiredMixin, APIView):
         # TODO: добавить в строке ниже в выборку фильтр: в переделах текущего года.
         max_num = (Document.objects.filter(root=self.request.user.appuser.root_organization)
                    .filter(date__year=datetime.now().year).aggregate(Max('number')))
-        numb = self.strplus(max_num['number__max'])
-        return Response({"number": numb})   # sample response: {"number":"Т012"}
+        if max_num['number__max']:
+            numb = self.strplus(max_num['number__max'])
+        else:
+            numb = self.strplus('0000')
+        return Response({"number": numb})  # sample response: {"number":"Т012"}
 
 
 class CurrencyCBR(APIView):
@@ -193,6 +226,8 @@ class CurrencyCBR(APIView):
         param_value = request.query_params['value']
         result = (float(data_to) / 1) / (float(data_from) / 1) * float(param_value)  # расчет через курс к рублю
         return Response({'result': round(result, 2), 'resource': "https://www.cbr-xml-daily.ru/latest.js"})
+
+
 # </API>
 
 

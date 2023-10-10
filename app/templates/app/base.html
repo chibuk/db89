@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% block title %}<title>db89</title>{% endblock %}
-
+    {% block head %} {% endblock %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'app/base.css' %}">
     <link rel="stylesheet" href="{% static 'app/bulma.min.css' %}">
     <link rel="stylesheet" href="{% static 'fontawesome/css/fontawesome.min.css' %}">
     <link rel="stylesheet" href="{% static 'fontawesome/css/light.min.css' %}">
-    <link rel="stylesheet" href="{% static 'app/print.css' %}">
+    <link rel="stylesheet" href="{% static 'app/print.css' %}" media="print">
 </head>
 <body class="has-navbar-fixed-top">
 
 {% block sidebar %}
-    {% if user.is_authenticated %} <!-- см. ::target псевдоклас для подсветки пункта меню -->
+    {% if user.is_authenticated %} <!-- см. ::target псевдокласс для подсветки пункта меню -->
     <nav class="navbar is-link is-fixed-top" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
             <a class="navbar-item" href="{% url 'rootorganization-list' %}">
@@ -61,18 +61,17 @@
     {% endif %}
 {% endblock %}
 {% csrf_token %}
-<div class="block content">
-    {% block content %} {% endblock %}
-</div>
-
+{% block content %} {% endblock %}
 <footer class="footer">
     <div class="content has-text-centered has-text-dark">
-        <p>&copy; Юрий Чибук, <span class="icon"><i class="fa-light fa-paper-plane"></i></span>
-            <a href='mailto:chibook@mail.ru' title="наисать мне">chibook@mail.ru</a>, 2023 г. </p>
+        <p>&copy; Юрий Чибук, 2023 г.
+            <br><span class="icon"><i class="fa-light fa-phone"></i></span> +7(922)090-02-02
+            <br><span class="icon"><i class="fa-light fa-paper-plane"></i></span>
+            <a href='mailto:chibook@mail.ru' title="наисать мне">chibook@mail.ru</a>
+        </p>
     </div>
 </footer>
 
-<!--</div>-->
 <script src="{% static 'app/base.js' %}"></script>
 </body>
 </html>

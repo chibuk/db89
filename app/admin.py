@@ -18,11 +18,11 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 class DocumentItemAdmin(admin.TabularInline):
     model = DocumentItem
-    list_display = ('document', 'item', 'weight', 'volume', 'price', 'seats', 'root')
+    list_display = ('document', 'item', 'weight', 'volume', 'price', 'item_sum', 'seats', 'root')
 
 
 class DocumentAdmin(admin.ModelAdmin):
-    list_display = ('number', 'date', 'root', 'city', 'destination_address', 'created', 'modified')
+    list_display = ('number', 'date', 'doc_sum', 'root', 'city', 'destination_address', 'created', 'modified')
     inlines = [DocumentItemAdmin]
 
 

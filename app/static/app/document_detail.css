@@ -5,4 +5,12 @@ table.is-bordered tfoot tr td {
 div.document {
     padding: 2rem 1rem;
     margin-bottom: 0rem;
+    width: 210mm;
+    height: 297mm;
+    background-color: white;
+}
+div.bg-document.container {
+    background-color: #eee;
+    width: 100%;
+    margin: 0;
 }

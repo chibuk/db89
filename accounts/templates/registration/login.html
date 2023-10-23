@@ -4,37 +4,53 @@
  <head>
     <meta charset="UTF-8" />
     <title>DB89 вход</title>
-    <link rel="icon" type="{% static 'image/png' %}" href="64x64.png" />
-    <link rel="stylesheet" href="{% static 'css/login.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/bulma.min.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/fontawesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/light.min.css' %}">
  </head>
-
 <body>
-
 {% block content %}
-<div class="login-page">
-  <div class="form">
-      {% if next %}
+<div class="hero has-background-success is-fullheight">
+    <div class="box m-auto" style="width: fit-content">
+
+        {% if next %}
             {% if user.is_authenticated %}
-                <p>По Вашей учетной записи доступ к данной странице ограничен.</p>
+                <p>Для Вашей учетной записи доступ к данной странице ограничен.</p>
             {% else %}
                 <p>Для доступа требуется вход.</p>
             {% endif %}
-      {% endif %}
-      <form class="login-form" method="post" action="{% url 'login' %}">
+        {% endif %}
+        <form class="form" method="post" action="/accounts/login/">
+<!--            <span class="icon is-large has-text-info m-auto">-->
+<!--                <i class="fa-light fa-2x fa-user"></i>-->
+<!--            </span>-->
           {% csrf_token %}
-          {{ form.username.label_tag }}
-          {{ form.username }}
-          {{ form.password.label_tag }}
-          {{ form.password }}
-          <input type="submit" value="Вход" />
-          <input type="hidden" name="next" value="{% url 'index' %}" /> <!-- {{ next }} -->
+          <div class="field">
+              <p class="control has-icons-left">
+                  <input type="email" name="username" autofocus autocapitalize="none" autocomplete="username"
+                         class="input" maxlength="150" required id="id_username" placeholder="E-mail">
+                  <span class="icon is-small is-left"><i class="fa-light fa-envelope"></i></span>
+              </p>
+          </div>
+
+            <div class="field">
+              <p class="control has-icons-left">
+                  <input type="password" name="password" autocomplete="current-password" required id="id_password"
+                        class="input" placeholder="Пароль">
+                  <span class="icon is-small is-left"><i class="fa-light fa-key"></i></span>
+              </p>
+          </div>
+
+            <button class="button is-link is-outlined is-fullwidth mt-3" type="submit">
+                Вход
+            </button>
+          <input type="hidden" name="next" value="/" />
           {% if form.errors %}
             <p>Неверное имя или пароль. <a href="{% url 'password_reset' %}">Сброс пароля.</a></p>
           {% endif %}
-      </form>
-  </div>
-</div>
+        </form>
 
+    </div>
 {% endblock %}
 <script src="{% static 'js/login.js' %}"></script>
 

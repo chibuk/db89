@@ -1,9 +1,9 @@
 from datetime import datetime
-
+from django_xhtml2pdf.views import PdfMixin
 from django import forms
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.db.models.aggregates import Max
+from django.db.models.aggregates import Max, Sum
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -107,12 +107,10 @@ class ItemAPIModelView(ModelViewSet):
         # keyword = kwargs.get["keyword"]
         # keyword = request.query_params["keyword"]
         queryset = self.filter_queryset(self.get_queryset()).filter(name__icontains=keyword)
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
+        # page = self.paginate_queryset(queryset)
+        # if page is not None:
+        #     serializer = self.get_serializer(page, many=True)
+        #     return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -132,6 +130,12 @@ class DocumentAPIModelView(ModelViewSet):
                         receiver=Organization.objects.filter(root=_root).get(id=_data['receiver']),
                         payer=Organization.objects.filter(root=_root).get(id=_data['payer']))
 
+    def last(self, request, *args, **kwargs):
+        # field = request.query_params["field"]
+        instance = self.get_queryset().last()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
 
 class DocumentitemAPIModelView(ModelViewSet):
     serializer_class = DocumentItemSerializer
@@ -139,13 +143,40 @@ class DocumentitemAPIModelView(ModelViewSet):
     def get_queryset(self):
         queryset = DocumentItem.objects.filter(root=self.request.user.appuser.root_organization)
         return queryset
+    """После создания, изменения или удаления, пересчет суммы в связанном документе"""
+    def calculatedocsum (self, doc_id):
+        _document = Document.objects.get(id=doc_id)
+        _items = self.get_queryset().filter(document=_document)  # Все строки
+        _document.doc_sum = 0  # сброс значения
+        for item in _items:
+            _document.doc_sum += item.item_sum  # суммируем поля
+        _document.save()
 
     def perform_create(self, serializer):
         _root = self.request.user.appuser.root_organization
         _data = self.request.data
+        _document = Document.objects.filter(root=_root).get(id=_data['document'])
         serializer.save(root=_root,
-                        document=Document.objects.filter(root=_root).get(id=_data['document']),
+                        document=_document,
                         item=Item.objects.filter(root=_root).get(name=_data['name']))
+        self.calculatedocsum(doc_id=_data['document'])
+
+    def perform_destroy(self, instance):
+        _id = instance.document.id
+        instance.delete()
+        self.calculatedocsum(doc_id=_id)
+
+    def perform_update(self, serializer):
+        _id = self.request.data['document']
+        serializer.save()
+        self.calculatedocsum(doc_id=_id)
+
+    """Возвращает список объектов, принадлежащих документу id URL...doclist?doc_id=id"""
+    def document_list (self, request, *args, **kwargs):
+        _doc_id = request.query_params['doc_id']
+        queryset = self.filter_queryset(self.get_queryset()).filter(document=_doc_id)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class OrganizationAPIModelView(ModelViewSet):
@@ -164,12 +195,10 @@ class OrganizationAPIModelView(ModelViewSet):
         # keyword = request.query_params["keyword"]
         queryset = self.filter_queryset(self.get_queryset()).filter(
             Q(name__icontains=keyword) | Q(inn__icontains=keyword))
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
+        # page = self.paginate_queryset(queryset)
+        # if page is not None:
+        #     serializer = self.get_serializer(page, many=True)
+        #     return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -238,6 +267,11 @@ class DocumentListView(LoginRequiredMixin, QueryRootMixin, ListView):
 
 
 class DocumentView(LoginRequiredMixin, DetailView):
+    login_url = reverse_lazy('login')
+    model = Document
+
+
+class DocumentPDFView(LoginRequiredMixin, PdfMixin, DetailView):
     login_url = reverse_lazy('login')
     model = Document
 

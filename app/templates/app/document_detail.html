@@ -2,68 +2,80 @@
 {% block head %}
 {% load static %}
     <link rel="stylesheet" href="{% static 'app/document_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'app/print.css' %}" media="print">
 {% endblock %}
 {% block content %}
 
-<div class="document content">
-    <h2>{{document.root.profile.name}}</h2>
-    <p>Адрес: {{document.root.profile.address}} ИНН: {{document.root.profile.inn}}
-        р/с {{document.root.profile.pay_account}} в {{document.root.profile.bank}}, к/с {{document.root.profile.kor_account}}
-        БИК: {{document.root.profile.bik}}<br> ОГРНИП: {{document.root.profile.ogrn}}<br>Тел.:
-        {{document.root.profile.phone}} email: {{document.root.profile.email}}</p>
-    <div>
-        <h3>Товарно-транспортная накладная № {{document.number}} от {{document.date}}</h3>
-        <p>Город: {{document.city}} номер ТС: {{document.truck}}</p>
-        <p>Отправитель: {{document.sender}}</p>
-        <p>Получатель: {{document.receiver}}</p>
-        <p>Плательщик: {{document.payer}}</p>
-        <table class="table is-narrow is-bordered">
-            <thead>
-                <tr>
-                    <th>№ п/п</th>
-                    <th>Наименование груза</th>
-                    <th>Количество мест</th>
-                    <th>Вес</th>
-                    <th>Объем</th>
-                    <th>Цена</th>
-                    <th>Сумма</th>
-                </tr>
-            </thead>
-            <tfoot>
-                <tr>
-                    <td></td> <td></td>
-                    <td colspan="4" class="has-text-right">
-                        Всего к оплате:
-                    </td>
-                    <td class="has-text-weight-bold	">
-                        {{document.doc_sum}}
-                    </td>
-                </tr>
-            </tfoot>
-            {% for row in document.items.all %}
-            <tr>
-                <td>{{forloop.counter}}</td>
-                <td>{{row.item}}</td>
-                <td>{{row.seats}}</td>
-                <td>{{row.weight}}</td>
-                <td>{{row.volume}}</td>
-                <td>{{row.price}}</td>
-                <td>{{row.item_sum}}</td>
-            </tr>
-            {% empty %}
-            <tr><td colspan = 7>Добавьте строки в таблицу.</td></tr>
-            {% endfor %}
-        </table>
-    </div>
-    <div>Особые отметки: {{document.spec_notes}}</div>
-    <div>Адрес доставки: {{document.destination_address}}</div>
-    <div>{{document.text}}</div>
-
-    <div class="no-print">
-        <a class="button" href="{% url 'document-update' pk=document.id %}">Редактировать</a>
-        <a class="button" href="{% url 'document-delete' pk=document.id %}">Удалить</a>
+<div class="bg-document container is-fluid">
+    <div class="columns">
+        <div class="column is-narrow">
+            <div class="pt-2 pb-2 no-print">
+                <a class="button is-link is-outlined" href="javascript:print()" title="Распечатать">
+                    <i class="fa-light fa-print"></i></a>
+            </div>
+            <div class="pt-2 pb-2 no-print">
+                <a class="button is-link is-outlined" href="javascript:history.back()" title="Вернуться">
+                    <i class="fa-light fa-backward"></i></a>
+            </div>
+        </div>
+        <div class="column">
+            <div class="document box content mt-2">
+                <h2 class="title is-5">{{document.root.profile.name}}</h2>
+                <p>Адрес: {{document.root.profile.address}} ИНН: {{document.root.profile.inn}}<br>
+                    р/с {{document.root.profile.pay_account}} в {{document.root.profile.bank}},
+                    к/с {{document.root.profile.kor_account}} БИК: {{document.root.profile.bik}}<br>
+                    ОГРНИП: {{document.root.profile.ogrn}}<br>
+                    Тел.: {{document.root.profile.phone}} email: {{document.root.profile.email}}</p>
+                <div>
+                    <h3 class="title is-4">Товарно-транспортная накладная № {{document.number}} </h3>
+                    <h3 class="subtitle is-5">от {{document.date}}</h3>
+                    <p>Город: {{document.city}} Авто: {{document.truck}}</p>
+                    <p>Отправитель: {{document.sender}} <br> {{document.sender.phone}}</p>
+                    <p>Получатель: {{document.receiver}} <br> {{document.receiver.phone}}</p>
+                    <p>Плательщик: {{document.payer}} <br> {{document.payer.phone}}</p>
+                    <table class="table is-narrow is-bordered">
+                        <thead>
+                            <tr>
+                                <th>№ п/п</th>
+                                <th>Наименование груза</th>
+                                <th>Кол-во</th>
+                                <th>Вес</th>
+                                <th>Объем</th>
+                                <th>Цена</th>
+                                <th>Сумма</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <td></td> <td></td>
+                                <td colspan="4" class="has-text-right">
+                                    Всего к оплате:
+                                </td>
+                                <td class="has-text-weight-bold	">
+                                    {{document.doc_sum}}
+                                </td>
+                            </tr>
+                        </tfoot>
+                        {% for row in document.items.all %}
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{row.item}}</td>
+                            <td>{{row.seats}}</td>
+                            <td>{{row.weight}}</td>
+                            <td>{{row.volume}}</td>
+                            <td>{{row.price}}</td>
+                            <td>{{row.item_sum}}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan = 7>Добавьте строки в таблицу.</td></tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div>Особые отметки: {{document.spec_notes}}</div>
+                <div>Адрес доставки: {{document.destination_address}}</div>
+                <div>{{document.text}}</div>
+            </div>
+        </div>
     </div>
 </div>
-
-
 {% endblock %}

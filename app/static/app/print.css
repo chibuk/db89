@@ -1,15 +1,16 @@
 nav, footer, .no-print {
-    display: none
+    display: none;
 }
 
-body.has-navbar-fixed-top {
+html body.has-navbar-fixed-top {
     padding-top: 0;
+    background-color: transparent;
 }
 
-div.section {
-    padding: 2mm;
+div.doc-panel-element {
+    display: none;
 }
 
-table.table {
-    font-size: .9rem;
+div.document.content.box {
+    box-shadow: none;
 }

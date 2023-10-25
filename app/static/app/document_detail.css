@@ -3,14 +3,43 @@ table.is-bordered tfoot tr td {
 }
 
 div.document {
-    padding: 2rem 1rem;
-    margin-bottom: 0rem;
-    width: 210mm;
-    height: 297mm;
+    margin: 0 0.2rem;
     background-color: white;
+    font-size: 0.75rem;
 }
-div.bg-document.container {
+div.portrait {
+    aspect-ratio: 210/297;
+    height: 75rem;
+}
+div.landscape {
+    aspect-ratio: 297/210;
+    width: 75rem;
+}
+
+div.doc-panel-element {
+    display: inline-block;
+    padding: 0.1rem 0 0.1rem 0.1rem;
+}
+
+div.document h1, div.document h2, div.document h3 {
+    font-weight: bold;
+}
+
+div.document h1 {
+    font-size: 1.6em;
+}
+
+div.document h2 {
+    font-size: 1.45em;
+}
+
+div.document h3 {
+    font-size: 1.3em;
+}
+
+body {
     background-color: #eee;
-    width: 100%;
-    margin: 0;
+}
+.rotate90 {
+    transform: rotate(-90deg);
 }

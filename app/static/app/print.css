@@ -11,6 +11,6 @@ div.doc-panel-element {
     display: none;
 }
 
-div.document.content.box {
-    box-shadow: none;
+div.field:not(:last-child) {
+    margin-bottom: 0;
 }

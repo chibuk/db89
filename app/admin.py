@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from app.models import Item, Organization, Document, AppUser, RootOrganization, DocumentItem
+from app.models import Item, Organization, Document, AppUser, RootOrganization, DocumentItem, ExtraInfo
 
 
 class AppUserAdmin(admin.ModelAdmin):
@@ -30,4 +30,5 @@ admin.site.register(Document, DocumentAdmin)
 admin.site.register(Item, ItemAdmin)
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(RootOrganization)
+admin.site.register(ExtraInfo)
 admin.site.register(AppUser, AppUserAdmin)

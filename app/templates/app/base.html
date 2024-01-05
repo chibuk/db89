@@ -10,6 +10,15 @@
     <link rel="stylesheet" href="{% static 'app/bulma.min.css' %}">
     <link rel="stylesheet" href="{% static 'fontawesome/css/fontawesome.min.css' %}">
     <link rel="stylesheet" href="{% static 'fontawesome/css/light.min.css' %}">
+
+    <style>
+        #base_content_container {
+            height: calc(100vh - 10rem);
+        }
+        #app {
+            height: 100%;
+        }
+    </style>
 </head>
 <body class="has-navbar-fixed-top">
 
@@ -54,19 +63,22 @@
                     <span class="icon" title="Выход"><i class="fa-light fa-right-from-bracket fa-lg"></i></span>
                 </a>
             </div>
+        </div>
     </nav>
     {% else %}
     <p class="box">Вы не авторизованы, <a href="{% url 'login'%}?next={{request.path}}">войти.</a></p>
     {% endif %}
 {% endblock %}
 {% csrf_token %}
-{% block content %} {% endblock %}
-<footer class="footer no-print">
+<div id="base_content_container">
+    {% block content %} {% endblock %}
+</div>
+<footer class="no-print">
     <div class="content has-text-centered has-text-dark">
         <p>&copy; Юрий Чибук, 2023 г.
             <br><span class="icon"><i class="fa-light fa-phone"></i></span> +7(922)090-02-02
             <br><span class="icon"><i class="fa-light fa-paper-plane"></i></span>
-            <a href='mailto:chibook@mail.ru' title="наисать мне">chibook@mail.ru</a>
+            <a href='mailto:chibook@mail.ru' title="написать мне">chibook@mail.ru</a>
         </p>
     </div>
 </footer>

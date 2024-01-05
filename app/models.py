@@ -15,7 +15,7 @@ class Organization(models.Model):
     """
     name = models.CharField("Наименование организации", max_length=50, help_text='Название организации')
     address = models.CharField('Адрес', max_length=256, blank=True, help_text="Адрес")
-    inn = models.CharField('ИНН', max_length=10, help_text='ИНН')   # обязательное ункалное для root
+    inn = models.CharField('ИНН', max_length=10, help_text='ИНН')  # обязательное ункалное для root
     kpp = models.CharField('КПП', max_length=9, help_text='КПП', blank=True)
     ogrn = models.CharField('ОГРН', max_length=15, help_text='ОГРН или ОГРНИП', blank=True)
     bank = models.CharField('Банк, наименование', max_length=150, help_text='Наименование банка', blank=True)
@@ -74,6 +74,25 @@ class AppUser(models.Model):
         return f"{self.user.get_username()} ({self.user.get_full_name()})"
 
 
+class ExtraInfo(models.Model):
+    """Для заполнения даух колонок в шапке документа (контакты, почта, и пр.)"""
+    title = models.CharField("Заголовок", max_length=64, help_text="Текст заголовка", unique=False, blank=False)
+    content = models.CharField("Содержимое", max_length=128, help_text="Введите контактные данные",
+                               unique=False, blank=False)
+    column = models.CharField("Номер столбца",
+                              choices=[('1', '1'), ('2', '2')],
+                              help_text="Введите номер",
+                              max_length=3, default='1')
+    root = models.ForeignKey("RootOrganization", on_delete=models.CASCADE, help_text='Профиль', verbose_name='Профиль')
+
+    def __dir__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = 'Данные профиля'
+        verbose_name_plural = 'Данные профилей'
+
+
 class RootOrganization(models.Model):
     """ Корневая организация (владелец своей БД), от имени которой будут выписываться документы """
     profile = models.OneToOneField(Organization,
@@ -83,9 +102,16 @@ class RootOrganization(models.Model):
                                    unique=True)
 
     users = models.ManyToManyField(AppUser,
-                                    verbose_name='Пользователи',
-                                    help_text='Пользователи',
-                                    blank=True)
+                                   verbose_name='Пользователи',
+                                   help_text='Пользователи',
+                                   blank=True)
+
+    admin = models.ForeignKey(AppUser,
+                              verbose_name='Администратол',
+                              help_text='Владелец',
+                              default=1,
+                              on_delete=models.SET_DEFAULT,
+                              related_name='admin')
 
     class Meta:
         verbose_name = 'Организация-профиль'
@@ -167,7 +193,7 @@ class Document(models.Model):
         # ordering = ['number']
         # TODO: Проверочное ограничение на уникальность ноиера документа в пределах текущего года.
         # constraints = [
-            # models.CheckConstraint(..., name='root_name_uinique')
+        # models.CheckConstraint(..., name='root_name_uinique')
         # ]
 
     def __str__(self):

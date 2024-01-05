@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -91,8 +92,34 @@ class DocumentItemAPIListView(ListCreateAPIView):
         return queryset
 
 
+class DinamicListLoadMixin:
+    """Модификация list для управления количеством возвращаемых записей.
+    Параметр q - количество, если его нет, то 10
+    Параметр s - с какой позиции идет выдача (или ноль).
+    Параметр o - порядок сортировки (по -id -- Записи выдаются с конца)
+    Это для динамической подгрузки содержимого таблицы во фронте"""
+    def list(self, request, *args, **kwargs):
+        order = request.GET.getlist("o", ["-id"])   # поле сортировки
+        filter_dict = request.GET.dict()            # QureyDict -> Dict, теперь из него удалим не нужное
+        quantity = int(filter_dict.pop('q', 10))    # количество "" | num
+        start = int(filter_dict.pop('s', 0))        # начальная позиция
+        pop_order = filter_dict.pop('o', '')        # удаляем так (а не del), чтобы не выкидывало исключение
+        myfilter = {}
+        for key in filter_dict.keys():
+            myfilter[key + "__icontains"] = filter_dict[key]
+        queryset = self.filter_queryset(self.get_queryset().filter(**myfilter)
+                                        .order_by(*order))[start:(quantity+start)]
+        # В нашем случае нет смысла в пагинеции, т.к. реализуем динамическую подгрузку
+        # page = self.paginate_queryset(queryset)
+        # if page is not None:
+        #     serializer = self.get_serializer(page, many=True)
+        #     return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
 # ModelViewSets
-class ItemAPIModelView(ModelViewSet):
+class ItemAPIModelView(DinamicListLoadMixin, ModelViewSet):
     serializer_class = ItemSerializer
 
     def get_queryset(self):
@@ -115,7 +142,7 @@ class ItemAPIModelView(ModelViewSet):
         return Response(serializer.data)
 
 
-class DocumentAPIModelView(ModelViewSet):
+class DocumentAPIModelView(DinamicListLoadMixin, ModelViewSet):
     serializer_class = DocumentSerializer
 
     def get_queryset(self):
@@ -179,33 +206,30 @@ class DocumentitemAPIModelView(ModelViewSet):
         return Response(serializer.data)
 
 
-class OrganizationAPIModelView(ModelViewSet):
+class OrganizationAPIModelView(DinamicListLoadMixin, ModelViewSet):
     serializer_class = OrganizationSerializer
 
     def get_queryset(self):
         queryset = Organization.objects.filter(root=self.request.user.appuser.root_organization)
-        # queryset = Organization.objects.filter(root=RootOrganization.objects.last())    #dev
         return queryset
 
     def perform_create(self, serializer):
+        inn = self.request.data['inn']  # проверить уникальность ИНН
+        is_exists = self.get_queryset().filter(inn=inn).exists()
+        if is_exists:
+            raise ValidationError({'inn': ['ИНН не уникален.']})
         serializer.save(root=self.request.user.appuser.root_organization)
 
     def search(self, request, keyword, *args, **kwargs):
-        # keyword = kwargs.get["keyword"]
-        # keyword = request.query_params["keyword"]
         queryset = self.filter_queryset(self.get_queryset()).filter(
             Q(name__icontains=keyword) | Q(inn__icontains=keyword))
-        # page = self.paginate_queryset(queryset)
-        # if page is not None:
-        #     serializer = self.get_serializer(page, many=True)
-        #     return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
 
 class DocumentNumber(LoginRequiredMixin, APIView):
     """Выдает очередной номер для нового документа по правилам именования:
-    - TODO: каждый год нумерация начинается сначала,
+    - TODO: каждый год нумерация начинается с начала,
     - номера в пределах года уникальные,
     - следующий номер получаем на основе последнего, прибавляя единицу к числу в конце"""
     renderer_classes = [JSONRenderer]
@@ -229,8 +253,8 @@ class DocumentNumber(LoginRequiredMixin, APIView):
         return prefix + num
 
     def get(self, request):
-        # TODO: если в этом году нет документов, то номер сразу равен пустой ("") строке, иначе:
-        # TODO: добавить в строке ниже в выборку фильтр: в переделах текущего года.
+        # если в этом году нет документов, то номер сразу равен strplus(0000) => "0001", иначе:
+        # добавляем в строке ниже в выборку фильтр: в переделах текущего года.
         max_num = (Document.objects.filter(root=self.request.user.appuser.root_organization)
                    .filter(date__year=datetime.now().year).aggregate(Max('number')))
         if max_num['number__max']:

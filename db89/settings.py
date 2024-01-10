@@ -55,6 +55,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'db89.urls'
 
 import os.path
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -144,3 +145,11 @@ REST_FRAMEWORK = {
 }
 
 CSRF_USE_SESSIONS = True
+
+# Email settings
+DEFAULT_FROM_EMAIL = 'noreply@db89.ru'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = True
